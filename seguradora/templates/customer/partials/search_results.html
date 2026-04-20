@@ -1,0 +1,37 @@
+
+
+    <section class="w-full h-full flex">
+        <aside class="w-2/10 h-full border-r border-r-foreground/50 flex flex-col px-6 pt-4">
+
+        <label class="flex items-center gap-2 mb-4">
+            <i data-lucide="filter" class="max-h-8  max-w-8 text-xs "></i> Filtros
+        </label>
+        
+
+        <select id="ordenar-select" class="select mb-4 bg-background border-foreground">
+            <option value="mais_recente">Mais recente</option>
+            <option value="menos_recente">Menos recente</option>
+        </select>
+        
+
+        <select id="status-select" class="select mb-4 bg-background border-foreground">
+            <option value="todas">Todas</option>
+            <option value="ativas">Ativas</option>
+            <option value="inativas">Inativas/Expiradas</option>
+        </select>
+
+        </aside>
+
+        <main class="w-8/10 h-full overflow-y-auto p-8 ">
+            <label class="text-foreground">{{ total_results }} resultados</label>
+            {% if results %}
+                {% for result in results %}
+                    {% include "components/_policy.html" with policy=result %}
+                {% endfor %}
+            {% else %}
+                <div class="w-full h-full flex items-center justify-center">
+                    <h1 class="text-foreground">Sem resultados</h1>
+                </div>
+            {% endif %}
+        </main>
+    </section>

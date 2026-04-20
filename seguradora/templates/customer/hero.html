@@ -1,0 +1,86 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+    <section class="w-full h-full overflow-y-auto overscroll-none scroll-smooth">
+        <section class="w-full h-full bg-principal flex">
+            <article class="flex flex-col items-center justify-center w-1/2 px-12">
+                <div class="text-white">
+                    <h1 class=" font-semibold text-3xl">Secure Sim</h1>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corrupti dolorum aliquid animi, distinctio soluta, accusantium, inventore beatae quia cupiditate dolore nam quibusdam omnis ad deserunt? Obcaecati ipsum aliquam excepturi. Possimus?</p>
+                </div>
+
+                <div class="flex mt-16 w-full gap-8">
+                    <button class="btn">
+                        Veja mais
+                    </button>
+                    <button class="btn btn-outline border-white text-white hover:bg-white hover:text-black">
+                        Já sou cliente
+                    </button>
+                </div>
+            </article>
+        </section>
+        <section class="w-full h-full flex flex-col items-center mt-10">
+            <section class="w-11/12 h-2/12 border-b border-b-foreground/50 flex gap-6 items-end p-4">
+                <h1 class="text-xl">
+                    Encontre sua apólice
+                </h1>
+                <div class="flex items-center">
+                    <input type="text" id="search-input" class="input
+                    bg-background border border-foreground font-sans rounded-r-none "
+                    placeholder="Digite seu CPF ou CNPJ"
+                    >
+                    <button id="search-btn" class="btn rounded-l-none shadow-none bg-principal border-none">
+                        <i data-lucide="search" ></i>
+                    </button>
+                </div>
+            </section>
+            <section class="w-full h-10/12">
+                <div id="results-container" class="w-full h-full"></div>
+            </section>
+        </section>
+    </section>
+
+<script>
+    // Função para carregar resultados via AJAX
+    function carregarResultados() {
+        const termo = document.getElementById('search-input').value;
+        const ordenar = document.getElementById('ordenar-select') ? document.getElementById('ordenar-select').value : 'mais_recente';
+        const status = document.getElementById('status-select') ? document.getElementById('status-select').value : 'todas';
+
+        // Constrói a URL com parâmetros
+        const url = `/policy_search/?q=${encodeURIComponent(termo)}&ordenar=${ordenar}&status=${status}`;
+
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'  // indica que é AJAX
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('results-container').innerHTML = html;
+            // Re-renderiza os ícones Lucide (se houver novos ícones no HTML carregado)
+            if (window.lucide) lucide.createIcons();
+        })
+        .catch(error => console.error('Erro na busca:', error));
+    }
+
+    // Eventos
+    document.getElementById('search-btn').addEventListener('click', carregarResultados);
+    document.getElementById('search-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') carregarResultados();
+    });
+
+    // Se os filtros já existirem na página (após a primeira busca), precisamos delegar eventos
+    // Como os filtros estão dentro do HTML carregado dinamicamente, usamos event delegation no documento
+    document.addEventListener('change', function(e) {
+        if (e.target.id === 'ordenar-select' || e.target.id === 'status-select') {
+            carregarResultados();
+        }
+    });
+</script>
+
+
+{% endblock %}

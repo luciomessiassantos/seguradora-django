@@ -1,0 +1,27 @@
+
+<div class="card bg-background border border-foreground p-5 mt-6">
+    <section class="  font-semibold text-black flex justify-between">
+        {{ policy.code }}
+
+        {% if policy.status == 'ACTIVE' %}
+            <div class=" p-2 px-4 rounded-full text-xs font-semibold bg-green-600/40 text-green-700">
+                Ativo
+            </div>
+        {% elif policy.status == 'INACTIVE' %}
+            <div class=" p-2 px-4 rounded-full text-xs font-semibold bg-gray-500/40 text-gray-700">
+                Inativo
+            </div>
+        {% else %}
+            <div class=" p-2 px-4 rounded-full text-xs font-semibold bg-red-700/40 text-red-800">
+                Expirado
+            </div>
+        {% endif %}
+    </section>
+    
+    <section class="mt-3 w-full flex gap-5">
+        <span class="text-sm">Criado em: {{ policy.created_at }}</span>
+        <span class="text-sm">
+            Expira em: {{ policy.expire_date }}
+        </span>
+    </section>
+</div>
