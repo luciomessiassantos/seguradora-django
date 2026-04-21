@@ -1,7 +1,7 @@
 
 <div class="card bg-background border border-foreground p-5 mt-6">
     <section class="  font-semibold text-black flex justify-between">
-        {{ policy.code }}
+        <a class="hover:link" href="{% url 'policy_details' policy.uuid %}">{{ policy.code }}</a>
 
         {% if policy.status == 'ACTIVE' %}
             <div class=" p-2 px-4 rounded-full text-xs font-semibold bg-green-600/40 text-green-700">

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <section class="w-full h-full overflow-y-auto">
+    <article class="w-full h-3/10 p-4 px-6">
+        <label class="text-gray-600 font-medium block mb-2">Dados de cliente</label>
+        <div class="card bg-background border border-foreground/50 rounded-lg w-full h-full p-5 px-7 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                    <p class="text-sm text-gray-500">Nome completo</p>
+                    <p class="font-medium">{{ customer.firstname }} {{ customer.lastname }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">CPF/CNPJ</p>
+                    <p class="font-medium">{{ customer.cpf_cnpj }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Idade</p>
+                    <p class="font-medium">{{ customer.age }} anos</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Renda</p>
+                    <p class="font-medium">R$ {{ customer.income|floatformat:2 }}</p>
+                </div>
+                <div class="md:col-span-2">
+                    <p class="text-sm text-gray-500">Endereço</p>
+                    <p class="font-medium">{{ customer.address }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Telefone</p>
+                    <p class="font-medium">{{ customer.phone_number }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">E-mail</p>
+                    <p class="font-medium">{{ customer.email_address }}</p>
+                </div>
+            </div>
+        </div>
+    </article>
+    <article class="w-full h-1/10 p-6 pt-8 px-6">
+        <label class="text-gray-600 font-medium block mb-2">Ações</label>
+        <section class="w-full h-9/10 flex gap-4 px-3">
+            <button class="btn btn-outline border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none">
+                <i data-lucide="shield-alert"></i>
+                Acionar sinistro
+            </button>
+            <button class="btn btn-outline border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none">
+                <i data-lucide="edit"></i>
+                Solicitar alteração de dados
+            </button>
+            <button class="btn btn-outline border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none">
+                <i data-lucide="megaphone"></i>
+                Suporte
+            </button>
+        </section>
+    </article>
+    <article class="w-full h-7/10 overflow-y-auto px-6 mt-16">
+        <label class="text-gray-600 font-medium block mb-2">Suas apólices</label>
+        {% for policy in customer_policies %}
+            {% include 'components/_policy.html' with policy=policy %}
+        {% endfor %}
+    </article>
+</section>
+{% endblock %}
+

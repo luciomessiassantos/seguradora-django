@@ -3,10 +3,32 @@ import uuid
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.core.exceptions import ValidationError
 
 # Create your models here.
+
+class CustomerProfile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='customer_profile')
+    cpf_cnpj = models.CharField(
+        max_length=18,
+        unique=True,
+        blank=True,
+        null=True,
+        verbose_name='CPF/CNPJ'
+    )
+
+    def clean(self):
+        
+        if self.cpf_cnpj and not self.user.groups.filter(name='customer').exists():
+            raise ValidationError({'cpf_cnpj': 'Apenas usuários do grupo "customer" podem ter CPF/CNPJ.'})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'Perfil de {self.user.username}'
 
 class BaseQuerySet(models.QuerySet):
 

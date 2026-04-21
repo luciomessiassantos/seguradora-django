@@ -7,7 +7,8 @@ urlpatterns = [
     path('login/', LoginViewPage.as_view(), name='login'),
     path('logout/', LogOutViewPage.as_view(), name='logout'),
     path('policy_search/', SearchPolicyAjaxView.as_view(), name='policy_search'),
-    
+    path('policy/<uuid:uuid>/', PolicyDetails.as_view(), name='policy_details'),
+
     path('secure/admin/dashboard/', AdminDashboard.as_view(), name='admin_dashboard'),
     path('customer/', CustomerPage.as_view(), name='customer_page'),
     path('manager/dashboard/', ManagerDashboard.as_view(), name='manager_dashboard'),

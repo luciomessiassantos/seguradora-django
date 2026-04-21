@@ -100,6 +100,27 @@ class SearchPolicyAjaxView(ListView):
 class CustomerPage(LoginRequiredMixin, TemplateView):
     template_name = 'customer/customer_dashboard.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        customer_data = None
+        
+        if user.groups.filter(name='customer').exists() and hasattr(user, 'customer_profile'):
+            cpf_cnpj = user.customer_profile.cpf_cnpj # type: ignore
+            print(f"CPF/CNPJ do perfil: '{cpf_cnpj}'")
+            if cpf_cnpj:
+                try:
+                    customer_data = Customer.objects.get(cpf_cnpj=cpf_cnpj)
+                except Customer.DoesNotExist:
+                    print("Not exist profile, for some reason")
+                    customer_data = None
+
+        context['customer'] = customer_data
+        context['customer_policies'] = customer_data.policies.all() # type: ignore
+
+        return context
+
+
 # Views admin
 
 class AdminDashboard(LoginRequiredMixin, TemplateView):
@@ -124,6 +145,7 @@ class ManagerDashboard(LoginRequiredMixin, TemplateView):
         context['total_customers'] = Customer.objects.count()
         context['total_policies'] = Policy.objects.count()
         context['total_claims'] = Claim.objects.count()
+
         return context
 
 # Views finance
@@ -138,4 +160,22 @@ class FinanceDashboard(LoginRequiredMixin, TemplateView):
         context['total_cover'] = Payment.objects.filter(direction='PAYABLE').filter(status='PAID').aggregate(Sum('paid_amount'))['paid_amount__sum']
         context['total_barred'] = Payment.objects.filter(status__in=['PENDING', 'OVERDUE']).aggregate(Sum('paid_amount'))['paid_amount__sum']
 
+        return context
+
+
+# Details Views
+
+class PolicyDetails(DetailView):
+    template_name = 'details/policy_details.html'
+    model = Policy
+    slug_field = 'uuid'         
+    slug_url_kwarg = 'uuid'
+    context_object_name = 'policy'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        is_manager_or_staff = user.is_staff or user.groups.filter(name='manager').exists()
+        context['is_manager_or_staff'] = is_manager_or_staff
         return context
