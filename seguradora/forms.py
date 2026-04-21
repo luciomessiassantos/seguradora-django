@@ -61,32 +61,14 @@ class CustomAuthenticationForm(AuthenticationForm):
         })
     )
 
-    # def clean(self):
-
-    #     username = self.cleaned_data.get('username')
-    #     password = self.cleaned_data.get('password')
-        
-    #     if not username or not password:
-    #         raise forms.ValidationError('Por favor, preencha ambos os campos.')
-        
-    #     user = authenticate(self.request, username=username, password=password)
-    #     if user is None:
-    #         raise forms.ValidationError('Usuário ou senha inválidos. Tente novamente.')
-        
-    #     if not user.is_active:
-    #         raise forms.ValidationError('Sua conta está desativada. Contate o suporte.')
-        
-    #     self.user = user
-    #     return self.cleaned_data
-
     def clean(self):
-        # 1. Obtém os dados limpos (username, password)
+        
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
 
-        # 2. Se algum campo estiver vazio, não prossegue (validação padrão)
+        
         if username is not None and password is not None:
-            # 3. Tenta autenticar
+            
             from django.contrib.auth import authenticate
             self.user_cache = authenticate(self.request, username=username, password=password)
             
@@ -95,7 +77,7 @@ class CustomAuthenticationForm(AuthenticationForm):
             else:
                 self.confirm_login_allowed(self.user_cache)
         
-        # 4. Retorna os dados limpos (importante)
+        
         return self.cleaned_data
 
         

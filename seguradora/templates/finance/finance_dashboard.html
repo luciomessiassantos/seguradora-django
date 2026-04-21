@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <section class="w-full h-full">
-        <section class="w-full p-4 px-6 flex gap-6 items-center">
+    <section class="w-full h-full overflow-y-auto">
+        <section class="w-full h-3/10 p-4 px-6 flex gap-6 items-center">
             <div class="card h-full w-1/3 px-8 flex flex-row items-center justify-between bg-principal text-white">
                 <div class="flex flex-col py-3  gap-6">
                     <label for="">Total de Lucros</label>
@@ -33,5 +33,120 @@
                 </div>
             </div>
         </section>
+        <section class="w-full h-1/10 px-6">
+            <label class="text-gray-600 font-medium block mb-2">Ações</label>
+        <section class="w-full h-9/10 flex gap-4 px-3">
+            <button class="btn btn-outline border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none">
+                <i data-lucide="plus"></i>
+                Registrar pagamento
+            </button>
+            <button class="btn btn-outline border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none">
+                <i data-lucide="edit"></i>
+                Solicitar alteração de dados
+            </button>
+            <button class="btn btn-outline border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none">
+                <i data-lucide="megaphone"></i>
+                Suporte
+            </button>
+        </section>
+        </section>
+        <section class="w-full h-7/10 overflow-y-auto mt-10 ">
+            
+                <div class="overflow-x-auto rounded-lg shadow">
+                    <table class="table w-full text-sm">
+                        
+                        <thead class="bg-gray-100 sticky top-0 text-black">
+                            <tr class="text-sm text-gray-600">
+                                <th>Direção</th>
+                                <th>Origem</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th>Pago</th>
+                                <th>Saldo</th>
+                                <th>Vencimento</th>
+                                <th>Pagamento</th>
+                                <th>Status</th>
+                                <th>Credor (se aplicável)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in payments %}
+                            <tr class="hover:bg-gray-50">
+                                
+                                <td>
+                                    {% if payment.direction == 'RECEIVABLE' %}
+                                    <span class="badge bg-green-400/50 text-green-700 border-none text-xs font-semibold w-full">Receber</span>
+                                    {% else %}
+                                    <span class="badge bg-red-400/50 text-red-700 border-none text-xs font-semibold w-full">Pagar</span>
+                                    {% endif %}
+                                </td>
+
+                                
+                                <td>
+                                    {% if payment.origin == 'PREMIUM' %}
+                                    <span class="badge bg-blue-400/50 text-blue-700 border-none text-xs font-semibold w-full">Prêmio</span>
+                                    {% elif payment.origin == 'CLAIM' %}
+                                    <span class="badge bg-purple-400/50 text-purple-700 border-none text-xs font-semibold w-full">Sinistro</span>
+                                    {% else %}
+                                    <span class="badge bg-gray-400/50 text-gray-700 border-none text-xs font-semibold w-full">Outro</span>
+                                    {% endif %}
+                                </td>
+
+                               
+                                <td class="max-w-xs truncate">{{ payment.description }}</td>
+
+                                
+                                <td class="font-mono">R$ {{ payment.amount|floatformat:2 }}</td>
+
+                              
+                                <td class="font-mono">R$ {{ payment.paid_amount|floatformat:2 }}</td>
+
+                                
+                                <td class="font-mono 
+                                    {% if payment.balance > 0 %}text-red-600{% else %}text-green-600{% endif %}">
+                                    R$ {{ payment.balance|floatformat:2 }}
+                                </td>
+
+                                
+                                <td class="text-xs text-center font-medium">{{ payment.due_date|date:"d.m.Y" }}</td>
+
+                               
+                                <td class="text-xs text-center font-medium">{{ payment.paid_date|date:"d.m.Y"|default:"-" }}</td>
+
+                                
+                                <td>
+                                    {% if payment.status == 'PENDING' %}
+                                    <span class="badge bg-yellow-400/50 text-yellow-700 border-none text-xs font-semibold w-full">Pendente</span>
+                                    {% elif payment.status == 'PAID' %}
+                                    <span class="badge bg-green-400/50 text-green-700 border-none text-xs font-semibold w-full">Pago</span>
+                                    {% elif payment.status == 'OVERDUE' %}
+                                    <span class="badge bg-red-400/50 text-red-700 border-none text-xs font-semibold w-full">Atrasado</span>
+                                    {% else %}
+                                    <span class="badge bg-gray-400/50 text-gray-700 border-none text-xs font-semibold w-full">Cancelado</span>
+                                    {% endif %}
+                                </td>
+
+                                
+                                <td>
+                                    {% if payment.direction == 'PAYABLE' %}
+                                        {{ payment.creditor_name|default:"-" }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="10" class="text-center py-8 text-gray-500">
+                                    Nenhum pagamento encontrado.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            
+        </section>
+
     </section>
 {% endblock %}

@@ -23,7 +23,7 @@ class LoginViewPage(LoginView):
     success_url = reverse_lazy('redirect')
 
     def get_success_url(self):
-        # Ignora qualquer parâmetro 'next' e vai direto para a view de transição
+        
         return reverse_lazy('redirect')
 
 class Redirect(LoginRequiredMixin, View):
@@ -159,7 +159,7 @@ class FinanceDashboard(LoginRequiredMixin, TemplateView):
         context['total_income'] = Payment.objects.filter(direction='RECEIVABLE').filter(status='PAID').aggregate(Sum('paid_amount'))['paid_amount__sum']
         context['total_cover'] = Payment.objects.filter(direction='PAYABLE').filter(status='PAID').aggregate(Sum('paid_amount'))['paid_amount__sum']
         context['total_barred'] = Payment.objects.filter(status__in=['PENDING', 'OVERDUE']).aggregate(Sum('paid_amount'))['paid_amount__sum']
-
+        context['payments'] = Payment.objects.all()
         return context
 
 
