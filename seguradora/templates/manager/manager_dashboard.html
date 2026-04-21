@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <section class="w-full h-full">
+                <section class="w-full p-4 px-6 flex gap-6 items-center">
+            <div class="card h-full w-1/3 px-8 flex flex-row items-center justify-between bg-principal text-white">
+                <div class="flex flex-col py-3  gap-6">
+                    <label for="">Total de Clientes</label>
+                    <span class="text-3xl font-semibold">{{ total_customers }}</span>
+                </div>
+                <div>
+                    <i class="w-12 h-12" data-lucide="user"></i>
+                </div>
+            </div>
+
+            <div class="card h-full w-1/3 px-8 flex flex-row items-center justify-between bg-principal text-white">
+                <div class="flex flex-col py-3  gap-6">
+                    <label for="">Total de Apólices</label>
+                    <span class="text-3xl font-semibold">{{ total_policies }}</span>
+                </div>
+                <div>
+                    <i class="w-12 h-12" data-lucide="clipboard"></i>
+                </div>
+            </div>
+
+            <div class="card h-full w-1/3 px-8 flex flex-row items-center justify-between bg-principal text-white">
+                <div class="flex flex-col py-3  gap-6">
+                    <label for="">Total de Sinistros</label>
+                    <span class="text-3xl font-semibold">{{ total_claims }}</span>
+                </div>
+                <div>
+                    <i class="w-12 h-12" data-lucide="bell-dot"></i>
+                </div>
+            </div>
+        </section>
+    </section>
+{% endblock %}

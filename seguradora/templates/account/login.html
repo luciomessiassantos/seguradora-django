@@ -1,0 +1,48 @@
+{% load tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    {% tailwind_css %}
+</head>
+<body>
+    <main class="w-full h-screen flex items-center justify-center bg-principal">
+        <section class="card w-4/10 h-8/10 bg-background  flex flex-col items-center justify-center">
+            <h1 class="text-principal text-3xl font-semibold">Entrar no Sistema</h1>
+            <form method="post" class="w-8/10 h-7/10 flex flex-col gap-6">
+                {% csrf_token %}
+
+                
+            <div class="w-full min-h-2/10">
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger bg-red-500/30 text-red-800 mt-4 border-none shadow-none">
+                        {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+                <div class="form-group flex flex-col text-black text-sm">
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+                    {{ form.username.errors }}
+                </div>
+
+                <div class="form-group flex flex-col text-black text-sm">
+                    {{ form.password.label_tag }}
+                    {{ form.password }}
+                    {{ form.password.errors }}
+                </div>
+
+                <button type="submit" class="btn btn-primary bg-principal border-principal w-full">Entrar</button>
+            </form>
+
+        </section>
+    </main>
+</body>
+</html>

@@ -38,6 +38,7 @@ def criar_grupos(apps, schema_editor):
             'add_claim', 'change_claim', 'delete_claim', 'view_claim',
             'view_customer',
             'view_payment',
+            'add_customer', 'change_customer', 'delete_customer'
         ]
     )
     manager_group.permissions.add(*perms_manager)

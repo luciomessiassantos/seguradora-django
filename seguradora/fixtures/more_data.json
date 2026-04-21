@@ -1,0 +1,330 @@
+[
+  {
+    "model": "seguradora.policy",
+    "pk": 7,
+    "fields": {
+      "customer": 1,
+      "code": "POL-007-2025",
+      "status": "ACTIVE",
+      "expire_date": "2027-01-15",
+      "deductible_type": "FIXED",
+      "fixed_deductible": "1000.00",
+      "percentage_deductible": null,
+      "coverage_amount": "120000.00",
+      "property": "Apartamento",
+      "property_value": "350000.00",
+      "premium_amount": "2400.00",
+      "periodicity": "ANNUAL",
+      "created_at": "2025-03-01T10:00:00Z",
+      "updated_at": "2025-03-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.policy",
+    "pk": 8,
+    "fields": {
+      "customer": 1,
+      "code": "POL-008-2025",
+      "status": "ACTIVE",
+      "expire_date": "2026-09-30",
+      "deductible_type": "PERCENTAGE",
+      "fixed_deductible": null,
+      "percentage_deductible": "8.00",
+      "coverage_amount": "80000.00",
+      "property": "Caminhonete",
+      "property_value": "120000.00",
+      "premium_amount": "3200.00",
+      "periodicity": "MONTHLY",
+      "created_at": "2025-03-10T14:30:00Z",
+      "updated_at": "2025-03-10T14:30:00Z"
+    }
+  },
+  {
+    "model": "seguradora.policy",
+    "pk": 9,
+    "fields": {
+      "customer": 2,
+      "code": "POL-009-2025",
+      "status": "EXPIRED",
+      "expire_date": "2025-01-20",
+      "deductible_type": "FIXED",
+      "fixed_deductible": "500.00",
+      "percentage_deductible": null,
+      "coverage_amount": "30000.00",
+      "property": "Moto",
+      "property_value": "20000.00",
+      "premium_amount": "700.00",
+      "periodicity": "ANNUAL",
+      "created_at": "2024-01-20T09:00:00Z",
+      "updated_at": "2024-01-20T09:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.policy",
+    "pk": 10,
+    "fields": {
+      "customer": 2,
+      "code": "POL-010-2025",
+      "status": "ACTIVE",
+      "expire_date": "2028-05-05",
+      "deductible_type": "PERCENTAGE",
+      "fixed_deductible": null,
+      "percentage_deductible": "20.00",
+      "coverage_amount": "500000.00",
+      "property": "Sítio",
+      "property_value": "2000000.00",
+      "premium_amount": "35000.00",
+      "periodicity": "ANNUAL",
+      "created_at": "2025-02-28T16:00:00Z",
+      "updated_at": "2025-02-28T16:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.claim",
+    "pk": 6,
+    "fields": {
+      "policy": 7,
+      "description": "Vazamento de água no apartamento",
+      "status": "OPEN",
+      "loss_amount": "8000.00",
+      "indemnity_amount": "0.00",
+      "created_at": "2025-03-15T11:20:00Z",
+      "updated_at": "2025-03-15T11:20:00Z"
+    }
+  },
+  {
+    "model": "seguradora.claim",
+    "pk": 7,
+    "fields": {
+      "policy": 8,
+      "description": "Acidente com caminhonete - danos à terceiros",
+      "status": "PAID",
+      "loss_amount": "15000.00",
+      "indemnity_amount": "13800.00",
+      "created_at": "2025-03-20T09:45:00Z",
+      "updated_at": "2025-04-01T14:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.claim",
+    "pk": 8,
+    "fields": {
+      "policy": 9,
+      "description": "Roubo da moto",
+      "status": "CLOSED",
+      "loss_amount": "20000.00",
+      "indemnity_amount": "19000.00",
+      "created_at": "2025-01-25T10:00:00Z",
+      "updated_at": "2025-02-10T16:30:00Z"
+    }
+  },
+  {
+    "model": "seguradora.claim",
+    "pk": 9,
+    "fields": {
+      "policy": 10,
+      "description": "Incêndio no sítio",
+      "status": "REJECTED",
+      "loss_amount": "250000.00",
+      "indemnity_amount": "0.00",
+      "created_at": "2025-03-01T08:15:00Z",
+      "updated_at": "2025-03-28T10:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.claim",
+    "pk": 10,
+    "fields": {
+      "policy": 7,
+      "description": "Danos elétricos no apartamento",
+      "status": "PAID",
+      "loss_amount": "3500.00",
+      "indemnity_amount": "3150.00",
+      "created_at": "2025-04-02T13:00:00Z",
+      "updated_at": "2025-04-10T09:30:00Z"
+    }
+  },
+  {
+    "model": "seguradora.claim",
+    "pk": 11,
+    "fields": {
+      "policy": 8,
+      "description": "Furto de equipamentos da caminhonete",
+      "status": "OPEN",
+      "loss_amount": "6000.00",
+      "indemnity_amount": "0.00",
+      "created_at": "2025-04-05T10:30:00Z",
+      "updated_at": "2025-04-05T10:30:00Z"
+    }
+  },
+  {
+    "model": "seguradora.payment",
+    "pk": 13,
+    "fields": {
+      "direction": "RECEIVABLE",
+      "origin": "PREMIUM",
+      "description": "Prêmio anual - Apólice 007",
+      "amount": "2400.00",
+      "paid_amount": "2400.00",
+      "due_date": "2025-04-01",
+      "paid_date": "2025-03-28",
+      "status": "PAID",
+      "creditor_name": "",
+      "created_at": "2025-03-20T10:00:00Z",
+      "updated_at": "2025-03-28T11:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.payment",
+    "pk": 14,
+    "fields": {
+      "direction": "RECEIVABLE",
+      "origin": "PREMIUM",
+      "description": "Mensalidade - Apólice 008 (Março)",
+      "amount": "266.67",
+      "paid_amount": "266.67",
+      "due_date": "2025-03-25",
+      "paid_date": "2025-03-22",
+      "status": "PAID",
+      "creditor_name": "",
+      "created_at": "2025-03-15T09:00:00Z",
+      "updated_at": "2025-03-22T14:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.payment",
+    "pk": 15,
+    "fields": {
+      "direction": "RECEIVABLE",
+      "origin": "PREMIUM",
+      "description": "Mensalidade - Apólice 008 (Abril)",
+      "amount": "266.67",
+      "paid_amount": "0.00",
+      "due_date": "2025-04-25",
+      "paid_date": null,
+      "status": "PENDING",
+      "creditor_name": "",
+      "created_at": "2025-04-01T10:00:00Z",
+      "updated_at": "2025-04-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.payment",
+    "pk": 16,
+    "fields": {
+      "direction": "RECEIVABLE",
+      "origin": "CLAIM",
+      "description": "Ressarcimento sinistro #7",
+      "amount": "13800.00",
+      "paid_amount": "13800.00",
+      "due_date": "2025-04-10",
+      "paid_date": "2025-04-05",
+      "status": "PAID",
+      "creditor_name": "",
+      "created_at": "2025-04-01T12:00:00Z",
+      "updated_at": "2025-04-05T15:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.payment",
+    "pk": 17,
+    "fields": {
+      "direction": "RECEIVABLE",
+      "origin": "CLAIM",
+      "description": "Indenização sinistro #10",
+      "amount": "3150.00",
+      "paid_amount": "3150.00",
+      "due_date": "2025-04-20",
+      "paid_date": "2025-04-18",
+      "status": "PAID",
+      "creditor_name": "",
+      "created_at": "2025-04-10T14:30:00Z",
+      "updated_at": "2025-04-18T11:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.payment",
+    "pk": 18,
+    "fields": {
+      "direction": "RECEIVABLE",
+      "origin": "OTHER",
+      "description": "Taxa de renovação - Apólice 010",
+      "amount": "500.00",
+      "paid_amount": "500.00",
+      "due_date": "2025-03-30",
+      "paid_date": "2025-03-27",
+      "status": "PAID",
+      "creditor_name": "",
+      "created_at": "2025-03-15T11:00:00Z",
+      "updated_at": "2025-03-27T09:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.payment",
+    "pk": 19,
+    "fields": {
+      "direction": "PAYABLE",
+      "origin": "CLAIM",
+      "description": "Pagamento de sinistro #7",
+      "amount": "13800.00",
+      "paid_amount": "13800.00",
+      "due_date": "2025-04-15",
+      "paid_date": "2025-04-10",
+      "status": "PAID",
+      "creditor_name": "João Silva",
+      "created_at": "2025-04-01T13:00:00Z",
+      "updated_at": "2025-04-10T16:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.payment",
+    "pk": 20,
+    "fields": {
+      "direction": "PAYABLE",
+      "origin": "CLAIM",
+      "description": "Pagamento de sinistro #10",
+      "amount": "3150.00",
+      "paid_amount": "3150.00",
+      "due_date": "2025-04-25",
+      "paid_date": "2025-04-22",
+      "status": "PAID",
+      "creditor_name": "João Silva",
+      "created_at": "2025-04-10T15:00:00Z",
+      "updated_at": "2025-04-22T10:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.payment",
+    "pk": 21,
+    "fields": {
+      "direction": "PAYABLE",
+      "origin": "OTHER",
+      "description": "Honorários periciais",
+      "amount": "2000.00",
+      "paid_amount": "0.00",
+      "due_date": "2025-05-10",
+      "paid_date": null,
+      "status": "PENDING",
+      "creditor_name": "Perito Associados",
+      "created_at": "2025-04-05T09:00:00Z",
+      "updated_at": "2025-04-05T09:00:00Z"
+    }
+  },
+  {
+    "model": "seguradora.payment",
+    "pk": 22,
+    "fields": {
+      "direction": "RECEIVABLE",
+      "origin": "PREMIUM",
+      "description": "Prêmio - Apólice 010 (parcela única)",
+      "amount": "35000.00",
+      "paid_amount": "17500.00",
+      "due_date": "2025-03-20",
+      "paid_date": null,
+      "status": "OVERDUE",
+      "creditor_name": "",
+      "created_at": "2025-02-28T16:00:00Z",
+      "updated_at": "2025-02-28T16:00:00Z"
+    }
+  }
+]
