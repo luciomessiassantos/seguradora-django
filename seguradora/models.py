@@ -38,6 +38,9 @@ class BaseQuerySet(models.QuerySet):
     def get_deleted(self):
         return self.filter(is_deleted=True)
     
+    
+
+    
 class BaseModelManager(models.Manager):
 
     def get_queryset(self) -> BaseQuerySet:
@@ -100,6 +103,8 @@ class BaseModel(models.Model):
         self.deleted_at = None
         self.deleted_by = None
         self.save()
+
+
 
 
 

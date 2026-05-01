@@ -5,6 +5,7 @@
 {% block content %}
 
     <section class="w-full h-full overflow-y-auto overscroll-none scroll-smooth">
+        
         <section class="w-full h-full bg-principal flex">
             <article class="flex flex-col items-center justify-center w-1/2 px-12">
                 <div class="text-white">
@@ -92,16 +93,14 @@
         .catch(error => console.error('Erro na busca:', error));
     }
 
-    // Eventos
     document.getElementById('search-btn').addEventListener('click', carregarResultados);
     document.getElementById('search-input').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') carregarResultados();
     });
 
-
     document.addEventListener('change', function(e) {
         if (e.target.id === 'ordenar-select' || e.target.id === 'status-select') {
-            carregarResultados();
+            if (termo || termo != "") carregarResultados();
         }
     });
 </script>

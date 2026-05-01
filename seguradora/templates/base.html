@@ -10,7 +10,7 @@
 
     {% tailwind_css %}
 </head>
-<body class="w-full h-screen bg-background text-black">
+<body class="w-full h-screen min-h-screen font-sans bg-background text-black">
 
     <header class="w-full h-1/10 bg-principal text-white flex items-center justify-between px-6">
         <a class="hover:link text-2xl " href="{% url 'redirect' %}">SecureSim</a>
@@ -19,7 +19,9 @@
                 <h1>Olá {{ user.username }}</h1>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-primary bg-principal border-principal shadow-none hover:link">Log Out</button>
+                    <button type="submit" class="btn btn-primary bg-principal border-principal shadow-none hover:link">
+                        <i data-lucide="log-out"></i>
+                        Sair</button>
                 </form>
             </div>
         {% else %}
@@ -27,7 +29,7 @@
         {% endif %}
     </header>
 
-    <main class="w-full h-9/10">
+    <main class="w-full min-h-9/10 h-9/10">
         {% block content %}
 
         {% endblock %}

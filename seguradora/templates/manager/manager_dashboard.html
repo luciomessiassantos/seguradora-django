@@ -1,7 +1,8 @@
 {% extends "base.html" %}
+{% load moeda_br %}
 
 {% block content %}
-    <section class="w-full h-full">
+    <section class="w-full h-full overflow-y-auto pb-8 bg-background">
                 <section class="w-full p-4 px-6 flex gap-6 items-center">
             <div class="card h-full w-1/3 px-8 flex flex-row items-center justify-between bg-principal text-white">
                 <div class="flex flex-col py-3  gap-6">
@@ -9,7 +10,7 @@
                     <span class="text-3xl font-semibold">{{ total_customers }}</span>
                 </div>
                 <div>
-                    <i class="w-12 h-12" data-lucide="user"></i>
+                    <i class="w-12 h-12" data-lucide="users-round"></i>
                 </div>
             </div>
 
@@ -33,5 +34,313 @@
                 </div>
             </div>
         </section>
+        <section class="w-full h-1/10 flex items-center gap-4 px-8">
+            <a class="btn btn-outline border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none" href="{% url 'customer_register' %}">
+                <i data-lucide="user-round-plus" ></i>
+                Registrar Cliente
+            </a>
+            <a class="btn btn-outline border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none" href="{% url 'policy_create' %}">
+                <i data-lucide="clipboard-plus" ></i>
+                Registrar Apólice
+            </a>
+            <a class="btn btn-outline border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none" href="{% url 'clain_create' %}">
+                <i data-lucide="shield-plus" ></i>
+                Registrar Sinistro
+            </a>
+        </section>
+
+
+    <section class="w-full h-8/10 mt-6 px-6">
+        <article class="card w-full h-96 px-6 border border-foreground shadow">
+            <header class="py-3 shrink-0 px-4 border-b border-b-foreground flex items-center">
+                <label class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="users-round"></i> Clientes
+                </label>
+            </header>
+            <main class="w-full h-10/14 overflow-y-auto ">
+                <table class="table  w-full text-sm">
+                    <thead class="bg-gray-100 sticky top-0 text-black">
+                        <tr class="text-sm text-gray-600">
+                            <th>Nome</th>
+                            <th>CPF/CNPJ</th>
+                            <th>Idade</th>
+                            <th>Renda</th>
+                            <th>Status</th>
+                            <th>Perfil de risco</th>
+                        </tr>
+                    </thead>
+                    <tbody class="">
+                        {% for customer in customers %}
+                        <tr class="hover:bg-gray-50 ">
+                            <td>{{ customer.firstname }} {{ customer.lastname }}</td>
+                            <td>{{ customer.cpf_cnpj }}</td>
+                            <td>{{ customer.age }}</td>
+                            <td>R$ {{ customer.income|br_money }}</td>
+                            <td>
+                                {% if customer.status == 'ACTIVE' %}
+                                <span class=" min-w-2/3 font-medium badge bg-green-400/50 text-green-700 border-none">Ativo</span>
+                                {% else %}
+                                <span class=" min-w-2/3 font-medium badge bg-red-400/50 text-red-700 border-none">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td class="flex justify-center">
+                                {% if customer.risk_profile == 'LOW' %}
+                                <span class=" font-medium badge bg-blue-400/50 text-blue-700 border-none">Baixo</span>
+                                {% elif customer.risk_profile == 'MEDIUM' %}
+                                <span class=" font-medium  badge bg-yellow-400/50 text-yellow-700 border-none">Médio</span>
+                                {% elif customer.risk_profile == 'HIGH' %}
+                                <span class=" font-medium  badge bg-red-400/50 text-red-700 border-none">Alto</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-6 text-gray-500">Nenhum cliente encontrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </main>
+            <footer class="w-full h-2/14 border-t border-t-foreground pt-3">
+                
+                {% if customers.has_other_pages %}
+                <div class="flex justify-center items-center gap-2 mt-2">
+                    <div class="join">
+                        {% if customers.has_previous %}
+                        <a href="?page_customers=1&page_policies={{ policies.number }}&page_claims={{ claims.number }}" class="join-item btn btn-sm btn-outline border-foreground" aria-label="Primeira página">
+                            <i data-lucide="chevrons-left" class="w-4 h-4"></i>
+                        </a>
+                        <a href="?page_customers={{ customers.previous_page_number }}&page_policies={{ policies.number }}&page_claims={{ claims.number }}" class="join-item btn btn-sm btn-outline border-foreground" aria-label="Página anterior">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </a>
+                        {% else %}
+                        <button class="join-item btn btn-sm btn-outline btn-disabled" disabled>
+                            <i data-lucide="chevrons-left" class="w-4 h-4"></i>
+                        </button>
+                        <button class="join-item btn btn-sm btn-outline btn-disabled" disabled>
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </button>
+                        {% endif %}
+
+                        {% for page_num in customers.paginator.get_elided_page_range %}
+                            {% if page_num == customers.number %}
+                            <span class="join-item btn btn-sm btn-active bg-principal text-white border-white">{{ page_num }}</span>
+                            {% elif page_num == customers.paginator.ELLIPSIS %}
+                            <span class="join-item btn btn-sm btn-outline btn-disabled">…</span>
+                            {% else %}
+                            <a href="?page_customers={{ page_num }}&page_policies={{ policies.number }}&page_claims={{ claims.number }}" class="join-item btn btn-sm btn-outline border-gray-500">{{ page_num }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if customers.has_next %}
+                        <a href="?page_customers={{ customers.next_page_number }}&page_policies={{ policies.number }}&page_claims={{ claims.number }}" class="join-item btn btn-sm btn-outline border-foreground" aria-label="Próxima página">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </a>
+                        <a href="?page_customers={{ customers.paginator.num_pages }}&page_policies={{ policies.number }}&page_claims={{ claims.number }}" class="join-item btn btn-sm btn-outline border-foreground" aria-label="Última página">
+                            <i data-lucide="chevrons-right" class="w-4 h-4"></i>
+                        </a>
+                        {% else %}
+                        <button class="join-item btn btn-sm btn-outline btn-disabled" disabled>
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                        <button class="join-item btn btn-sm btn-outline btn-disabled" disabled>
+                            <i data-lucide="chevrons-right" class="w-4 h-4"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </footer>
+        </article>
+    </section>
+
+
+    <section class="w-full h-8/10 mt-8 px-6">
+        <article class="card w-full h-96 px-6 border border-foreground shadow">
+            <header class="w-full py-3 shrink-0 px-4 border-b border-b-foreground flex items-center">
+                <label class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="clipboard"></i> Apólices
+                </label>
+            </header>
+            <main class="flex-1 overflow-y-auto">
+                <table class="table w-full text-sm">
+                    <thead class="bg-gray-100 sticky top-0 text-black">
+                        <tr class="text-sm text-gray-600">
+                            <th>Código</th>
+                            <th>Cliente</th>
+                            <th>Status</th>
+                            <th>Valor prêmio</th>
+                            <th>Periodicidade</th>
+                            <th>Vencimento</th>
+                        </tr>
+                    </thead>
+                    <tbody class=" max-h-full">
+                        {% for policy in policies %}
+                        <tr class="hover:bg-gray-50">
+                            <td>{{ policy.code }}</td>
+                            <td>{{ policy.customer.firstname }} {{ policy.customer.lastname }}</td>
+                            <td class="flex justify-center">
+                                {% if policy.status == 'ACTIVE' %}
+                                <span class=" font-medium badge bg-green-400/50 text-green-700 border-none">Ativa</span>
+                                {% elif policy.status == 'INACTIVE' %}
+                                <span class=" font-medium badge bg-yellow-400/50 text-yellow-700 border-none">Inativa</span>
+                                {% elif policy.status == 'EXPIRED' %}
+                                <span class=" font-medium badge bg-red-400/50 text-red-700 border-none">Expirada</span>
+                                {% endif %}
+                            </td>
+                            <td>R$ {{ policy.premium_amount|br_money }}</td>
+                            <td>{{ policy.get_periodicity_display }}</td>
+                            <td>{{ policy.expire_date|date:"d/m/Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-6 text-gray-500">Nenhuma apólice encontrada.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </main>
+            <footer class="py-3 shrink-0 border-t border-t-foreground ">
+               
+                {% if policies.has_other_pages %}
+                <div class="flex justify-center items-center gap-2 mt-2">
+                    <div class="join">
+                        {% if policies.has_previous %}
+                        <a href="?page_policies=1&page_customers={{ customers.number }}&page_claims={{ claims.number }}" class="join-item btn btn-sm btn-outline border-foreground">
+                            <i data-lucide="chevrons-left" class="w-4 h-4"></i>
+                        </a>
+                        <a href="?page_policies={{ policies.previous_page_number }}&page_customers={{ customers.number }}&page_claims={{ claims.number }}" class="join-item btn btn-sm btn-outline border-foreground">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </a>
+                        {% else %}
+                        <button class="join-item btn btn-sm btn-outline btn-disabled" disabled>...</button>
+                        {% endif %}
+
+                        {% for page_num in policies.paginator.get_elided_page_range %}
+                            {% if page_num == policies.number %}
+                            <span class="join-item btn btn-sm btn-active bg-principal text-white border-white">{{ page_num }}</span>
+                            {% elif page_num == policies.paginator.ELLIPSIS %}
+                            <span class="join-item btn btn-sm btn-outline btn-disabled">…</span>
+                            {% else %}
+                            <a href="?page_policies={{ page_num }}&page_customers={{ customers.number }}&page_claims={{ claims.number }}" class="join-item btn btn-sm btn-outline border-gray-500 hover:bg-foreground">{{ page_num }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if policies.has_next %}
+                        <a href="?page_policies={{ policies.next_page_number }}&page_customers={{ customers.number }}&page_claims={{ claims.number }}" class="join-item btn btn-sm btn-outline border-foreground hover:bg-foreground ">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </a>
+                        <a href="?page_policies={{ policies.paginator.num_pages }}&page_customers={{ customers.number }}&page_claims={{ claims.number }}" class="join-item btn btn-sm btn-outline border-foreground hover:bg-foreground ">
+                            <i data-lucide="chevrons-right" class="w-4 h-4"></i>
+                        </a>
+                        {% else %}
+                        <button class="join-item btn btn-sm btn-outline btn-disabled" disabled>...</button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </footer>
+        </article>
+    </section>
+
+
+    <section class="w-full h-8/10 mt-8 px-6">
+        <article class="card w-full h-96 px-6 border border-foreground shadow">
+
+            <header class="shrink-0 px-4 py-3 border-b border-b-foreground flex items-center">
+                <label class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="shield"></i> Sinistros
+                </label>
+            </header>
+
+            <main class="flex-1 overflow-y-auto">
+                <table class="table w-full text-sm">
+                    <thead class="bg-gray-100 sticky top-0 text-black">
+                        <tr class="text-sm text-gray-600">
+                            <th>Código sinistro</th>
+                            <th>Apólice</th>
+                            <th>Descrição</th>
+                            <th>Prejuízo</th>
+                            <th>Indenização</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for claim in claims %}
+                        <tr class="hover:bg-gray-50">
+                            <td>{{ claim.uuid|slice:":8" }}...</td>
+                            <td>{{ claim.policy.code }}</td>
+                            <td class="max-w-xs truncate">{{ claim.description }}</td>
+                            <td>R$ {{ claim.loss_amount|br_money }}</td>
+                            <td>R$ {{ claim.indemnity_amount|br_money }}</td>
+                            <td class="flex justify-center">
+                                {% if claim.status == 'OPEN' %}
+                                <span class="badge bg-yellow-400/50 text-yellow-700 border-none">Aberto</span>
+                                {% elif claim.status == 'PAID' %}
+                                <span class=" font-medium badge bg-green-400/50 text-green-700 border-none">Pago</span>
+                                {% elif claim.status == 'CLOSED' %}
+                                <span class=" font-medium badge bg-gray-400/50 text-gray-700 border-none">Fechado</span>
+                                {% elif claim.status == 'REJECTED' %}
+                                <span class=" font-medium badge bg-red-400/50 text-red-700 border-none">Rejeitado</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-6 text-gray-500">Nenhum sinistro encontrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </main>
+            <footer class="py-2 shrink-0 border-t border-t-foreground pt-3">
+
+                
+                {% if claims.has_other_pages %}
+                <div class="flex justify-center items-center gap-2 mt-2">
+                    <div class="join">
+                        {% if claims.has_previous %}
+                        <a href="?page_claims=1&page_customers={{ customers.number }}&page_policies={{ policies.number }}" class="join-item btn btn-sm btn-outline border-foreground hover:bg-foreground">
+                            <i data-lucide="chevrons-left" class="w-4 h-4"></i>
+                        </a>
+                        <a href="?page_claims={{ claims.previous_page_number }}&page_customers={{ customers.number }}&page_policies={{ policies.number }}" class="join-item btn btn-sm btn-outline border-foreground hover:bg-foreground">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </a>
+                        {% else %}
+                        <button class="join-item btn btn-sm btn-outline btn-disabled" disabled>...</button>
+                        {% endif %}
+
+                        {% for page_num in claims.paginator.get_elided_page_range %}
+                            {% if page_num == claims.number %}
+                            <span class="join-item btn btn-sm btn-active bg-principal text-white border-white">{{ page_num }}</span>
+                            {% elif page_num == claims.paginator.ELLIPSIS %}
+                            <span class="join-item btn btn-sm btn-outline btn-disabled">…</span>
+                            {% else %}
+                            <a href="?page_claims={{ page_num }}&page_customers={{ customers.number }}&page_policies={{ policies.number }}" class="join-item btn btn-sm btn-outline border-gray-500 hover:bg-foreground">{{ page_num }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if claims.has_next %}
+                        <a href="?page_claims={{ claims.next_page_number }}&page_customers={{ customers.number }}&page_policies={{ policies.number }}" class="join-item btn btn-sm btn-outline border-foreground hover:bg-foreground">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </a>
+                        <a href="?page_claims={{ claims.paginator.num_pages }}&page_customers={{ customers.number }}&page_policies={{ policies.number }}" class="join-item btn btn-sm btn-outline border-foreground hover:bg-foreground">
+                            <i data-lucide="chevrons-right" class="w-4 h-4"></i>
+                        </a>
+                        {% else %}
+                        <button class="join-item btn btn-sm btn-outline btn-disabled" disabled>...</button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </footer>
+        </article>
+    </section>
+</div>
+    <footer class="w-full h-3/10 px-8 pt-12">
+        <div class="w-full h-full">
+
+        </div>
+    </footer>
     </section>
 {% endblock %}

@@ -1,12 +1,13 @@
 {% extends "base.html" %}
+{% load moeda_br %}
 
 {% block content %}
-    <section class="w-full h-full overflow-y-auto">
+    <section class="w-full h-full overflow-y-auto bg-background">
         <section class="w-full h-3/10 p-4 px-6 flex gap-6 items-center">
             <div class="card h-full w-1/3 px-8 flex flex-row items-center justify-between bg-principal text-white">
                 <div class="flex flex-col py-3  gap-6">
                     <label for="">Total de Lucros</label>
-                    <span class="text-3xl font-semibold">R$ {{ total_income }}</span>
+                    <span class="text-3xl font-semibold">R$ {{ total_income|br_money }}</span>
                 </div>
                 <div>
                     <i class="w-12 h-12" data-lucide="banknote-arrow-up"></i>
@@ -16,7 +17,7 @@
             <div class="card h-full w-1/3 px-8 flex flex-row items-center justify-between bg-principal text-white">
                 <div class="flex flex-col py-3  gap-6">
                     <label for="">Total de Pagamentos</label>
-                    <span class="text-3xl font-semibold">R$ {{ total_cover }}</span>
+                    <span class="text-3xl font-semibold">R$ {{ total_cover|br_money }}</span>
                 </div>
                 <div>
                     <i class="w-12 h-12" data-lucide="banknote-arrow-down"></i>
@@ -26,7 +27,7 @@
             <div class="card h-full w-1/3 px-8 flex flex-row items-center justify-between bg-principal text-white">
                 <div class="flex flex-col py-3  gap-6">
                     <label for="">Total Parado</label>
-                    <span class="text-3xl font-semibold">R$ {{ total_barred }}</span>
+                    <span class="text-3xl font-semibold">R$ {{ total_barred|br_money }}</span>
                 </div>
                 <div>
                     <i class="w-12 h-12" data-lucide="banknote-x"></i>
@@ -34,25 +35,34 @@
             </div>
         </section>
         <section class="w-full h-1/10 px-6">
-            <label class="text-gray-600 font-medium block mb-2">Ações</label>
-        <section class="w-full h-9/10 flex gap-4 px-3">
-            <button class="btn btn-outline border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none">
+        <section class="w-full h-9/10 flex items-center gap-4 px-3">
+            <a href="{% url 'payment_register' %}" class="btn btn-outline flex items-center justify-start border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none">
                 <i data-lucide="plus"></i>
                 Registrar pagamento
-            </button>
-            <button class="btn btn-outline border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none">
+            </a>
+            
+            <!-- <button class="btn btn-outline border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none">
                 <i data-lucide="edit"></i>
                 Solicitar alteração de dados
             </button>
             <button class="btn btn-outline border-foreground text-gray-600 hover:bg-foreground/30 hover:shadow-none">
                 <i data-lucide="megaphone"></i>
                 Suporte
-            </button>
+            </button> -->
         </section>
         </section>
-        <section class="w-full h-7/10 overflow-y-auto mt-10 ">
-            
-                <div class="overflow-x-auto rounded-lg shadow">
+
+    <section class="w-full h-8/10 mt-8 px-6">
+        <article class="card w-full h-128 px-6 border border-foreground shadow">
+
+            <header class="shrink-0 px-4 py-3 border-b border-b-foreground flex items-center">
+                <label class="flex items-center gap-2 text-gray-600">
+                    <i data-lucide="money"></i> Pagamentos
+                </label>
+            </header>
+
+            <main class="flex-1 overflow-y-auto">
+                <div class="overflow-x-auto rounded-lg">
                     <table class="table w-full text-sm">
                         
                         <thead class="bg-gray-100 sticky top-0 text-black">
@@ -66,12 +76,12 @@
                                 <th>Vencimento</th>
                                 <th>Pagamento</th>
                                 <th>Status</th>
-                                <th>Credor (se aplicável)</th>
+                                <th>Credor</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for payment in payments %}
-                            <tr class="hover:bg-gray-50">
+                            <tr class="hover:bg-gray-50 hover:border hover:border-foreground hover:rounded-lg">
                                 
                                 <td>
                                     {% if payment.direction == 'RECEIVABLE' %}
@@ -81,7 +91,6 @@
                                     {% endif %}
                                 </td>
 
-                                
                                 <td>
                                     {% if payment.origin == 'PREMIUM' %}
                                     <span class="badge bg-blue-400/50 text-blue-700 border-none text-xs font-semibold w-full">Prêmio</span>
@@ -145,8 +154,68 @@
                         </tbody>
                     </table>
                 </div>
-            
-        </section>
+            </main>
+            <footer class="py-2 shrink-0 border-t border-t-foreground pt-3">
+                {% if is_paginated %}
+                <div class="flex justify-center items-center gap-2 mt-6">
+
+                    <div class="join">
+
+                        <!-- Valida se há objetos na página anterior da atual -->
+                        {% if page_obj.has_previous %}
+                        <a href="?page=1" class="join-item btn btn-sm btn-outline border-foreground" aria-label="Primeira página">
+                            <i data-lucide="chevrons-left" class="w-4 h-4"></i>
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}" class="join-item btn btn-sm btn-outline border-foreground" aria-label="Página anterior">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </a>
+                        {% else %}
+                        <button class="join-item btn btn-sm btn-outline btn-disabled" disabled>
+                            <i data-lucide="chevrons-left" class="w-4 h-4"></i>
+                        </button>
+                        <button class="join-item btn btn-sm btn-outline btn-disabled" disabled>
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </button>
+                        {% endif %}
+
+                            <!-- Lista todas as páginas de objetos existentes -->
+                                {% for page_num in page_obj.paginator.get_elided_page_range %}
+                                    {% if page_num == page_obj.number %}
+                                        <span class="join-item btn btn-sm btn-active bg-principal text-white border-white">
+                                            {{ page_num }}
+                                        </span>
+                                    {% elif page_num == paginator.ELLIPSIS %}
+                                        <span class="join-item btn btn-sm btn-outline btn-disabled">…</span>
+                                    {% else %}
+                                        <a href="?page={{ page_num }}" class="join-item btn btn-sm btn-outline border-gray-500">
+                                            {{ page_num }}
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                        
+
+                        <!-- Valida se há páginas depois da página atual -->
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="join-item btn btn-sm btn-outline border-foreground" aria-label="Próxima página">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="join-item btn btn-sm btn-outline border-foreground" aria-label="Última página">
+                            <i data-lucide="chevrons-right" class="w-4 h-4"></i>
+                        </a>
+                        {% else %}
+                        <button class="join-item btn btn-sm btn-outline btn-disabled" disabled>
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                        <button class="join-item btn btn-sm btn-outline btn-disabled" disabled>
+                            <i data-lucide="chevrons-right" class="w-4 h-4"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            </footer>
+        </article>
+    </section>
 
     </section>
 {% endblock %}
