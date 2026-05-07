@@ -1,0 +1,26 @@
+[
+    {
+        "model": "seguradora.customer",
+        "pk": 1,
+        "fields": {
+            "uuid": "11111111-1111-1111-1111-111111111111",
+            "created_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "firstname": "Joao",
+            "lastname": "Silva",
+            "cpf_cnpj": "12345678901",
+            "income": "5000.00",
+            "age": 30,
+            "address": "Rua Principal",
+            "phone_number": "84999999999",
+            "email_address": "joao@email.com",
+            "status": "ACTIVE",
+            "risk_profile": "MEDIUM"
+        }
+    }
+]

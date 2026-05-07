@@ -19,8 +19,8 @@ class CustomerUserCreationForm(UserCreationForm):
         if commit:
             user.save()
             
-            if user.groups.filter(name='customers').exists():
-                profile = user.customer_profile
+            if user.groups.filter(name='customer').exists():
+                profile, _ = CustomerProfile.objects.get_or_create(user=user)
                 profile.cpf_cnpj = self.cleaned_data.get('cpf_cnpj')
                 profile.save()
         return user
@@ -32,12 +32,18 @@ class CustomerUserChangeForm(UserChangeForm):
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'cpf_cnpj')
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        profile = getattr(self.instance, 'customer_profile', None)
+        if profile and profile.cpf_cnpj:
+            self.fields['cpf_cnpj'].initial = profile.cpf_cnpj
+
     def save(self, commit=True):
         user = super().save(commit=False)
         if commit:
             user.save()
-            if user.groups.filter(name='customers').exists():
-                profile = user.customer_profile
+            if user.groups.filter(name='customer').exists():
+                profile, _ = CustomerProfile.objects.get_or_create(user=user)
                 profile.cpf_cnpj = self.cleaned_data.get('cpf_cnpj')
                 profile.save()
         return user
@@ -179,7 +185,7 @@ class PolicyForm(forms.ModelForm):
             'status': forms.Select(attrs={
                 'class': 'select select-bordered border-foreground w-full bg-background text-black'
             }),
-            'expire_date': forms.DateInput(attrs={
+            'expire_date': forms.DateInput(format='%Y-%m-%d', attrs={
                 'type': 'date',
                 'class': 'input input-bordered border-foreground w-full bg-background text-black'
             }),
@@ -230,6 +236,8 @@ class PolicyForm(forms.ModelForm):
         self.fields['property_value'].label = 'Valor do bem'
         self.fields['premium_amount'].label = 'Valor do prêmio'
         self.fields['periodicity'].label = 'Periodicidade'
+        self.fields['customer'].queryset = Customer.objects.actives()
+        self.fields['expire_date'].input_formats = ['%Y-%m-%d']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -276,6 +284,7 @@ class ClaimForm(forms.ModelForm):
         self.fields['loss_amount'].label = 'Valor do prejuízo'
         self.fields['indemnity_amount'].label = 'Valor indenizado'
         self.fields['status'].label = 'Status'
+        self.fields['policy'].queryset = Policy.objects.actives()
 
     def clean_indemnity_amount(self):
         indemnity = self.cleaned_data.get('indemnity_amount')
@@ -311,11 +320,11 @@ class PaymentForm(forms.ModelForm):
                 'class': 'input input-bordered border-foreground w-full bg-background text-black',
                 'placeholder': 'Valor já pago'
             }),
-            'due_date': forms.DateInput(attrs={
+            'due_date': forms.DateInput(format='%Y-%m-%d', attrs={
                 'type': 'date',
                 'class': 'input input-bordered border-foreground w-full bg-background text-black'
             }),
-            'paid_date': forms.DateInput(attrs={
+            'paid_date': forms.DateInput(format='%Y-%m-%d', attrs={
                 'type': 'date',
                 'class': 'input input-bordered border-foreground w-full bg-background text-black'
             }),
@@ -339,6 +348,8 @@ class PaymentForm(forms.ModelForm):
         self.fields['paid_date'].label = 'Data de pagamento'
         self.fields['status'].label = 'Status'
         self.fields['creditor_name'].label = 'Credor'
+        self.fields['due_date'].input_formats = ['%Y-%m-%d']
+        self.fields['paid_date'].input_formats = ['%Y-%m-%d']
 
     def clean(self):
         cleaned_data = super().clean()

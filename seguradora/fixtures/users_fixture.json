@@ -1,0 +1,112 @@
+[
+    {
+        "model": "auth.group",
+        "pk": 1,
+        "fields": {
+            "name": "customer",
+            "permissions": []
+        }
+    },
+    {
+        "model": "auth.group",
+        "pk": 2,
+        "fields": {
+            "name": "manager",
+            "permissions": []
+        }
+    },
+    {
+        "model": "auth.group",
+        "pk": 3,
+        "fields": {
+            "name": "finance",
+            "permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$720000$dummy$dummyhash",
+            "last_login": null,
+            "is_superuser": true,
+            "username": "admin",
+            "first_name": "Admin",
+            "last_name": "Sistema",
+            "email": "admin@seguradora.com",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2026-01-01T00:00:00Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 2,
+        "fields": {
+            "password": "pbkdf2_sha256$720000$dummy$dummyhash",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "manager",
+            "first_name": "Manager",
+            "last_name": "Sistema",
+            "email": "manager@seguradora.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2026-01-01T00:00:00Z",
+            "groups": [
+                2
+            ],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 3,
+        "fields": {
+            "password": "pbkdf2_sha256$720000$dummy$dummyhash",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "finance",
+            "first_name": "Finance",
+            "last_name": "Sistema",
+            "email": "finance@seguradora.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2026-01-01T00:00:00Z",
+            "groups": [
+                3
+            ],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 4,
+        "fields": {
+            "password": "pbkdf2_sha256$720000$dummy$dummyhash",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "customer",
+            "first_name": "Cliente",
+            "last_name": "Teste",
+            "email": "customer@seguradora.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2026-01-01T00:00:00Z",
+            "groups": [
+                1
+            ],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "seguradora.customerprofile",
+        "pk": 1,
+        "fields": {
+            "user": 4,
+            "cpf_cnpj": "12345678901"
+        }
+    }
+]

@@ -1,0 +1,192 @@
+[
+    {
+        "model": "seguradora.claim",
+        "pk": 1,
+        "fields": {
+            "uuid": "b04f62f6-593f-4305-8d20-9a659e4a3f7f",
+            "created_at": "2026-01-12T00:00:00Z",
+            "updated_at": "2026-01-12T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "policy": 1,
+            "description": "Sinistro referente à apólice POL-1001",
+            "status": "OPEN",
+            "loss_amount": "43698.00",
+            "indemnity_amount": "28651.00"
+        }
+    },
+    {
+        "model": "seguradora.claim",
+        "pk": 2,
+        "fields": {
+            "uuid": "16e0066f-f1ef-49cd-87bb-2e38bd207e94",
+            "created_at": "2026-01-13T00:00:00Z",
+            "updated_at": "2026-01-13T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "policy": 2,
+            "description": "Sinistro referente à apólice POL-1002",
+            "status": "OPEN",
+            "loss_amount": "27298.00",
+            "indemnity_amount": "10105.00"
+        }
+    },
+    {
+        "model": "seguradora.claim",
+        "pk": 3,
+        "fields": {
+            "uuid": "9f44402f-c40c-4ffc-8842-b0b2249cbf5d",
+            "created_at": "2026-01-14T00:00:00Z",
+            "updated_at": "2026-01-14T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "policy": 3,
+            "description": "Sinistro referente à apólice POL-1003",
+            "status": "PAID",
+            "loss_amount": "10164.00",
+            "indemnity_amount": "10044.00"
+        }
+    },
+    {
+        "model": "seguradora.claim",
+        "pk": 4,
+        "fields": {
+            "uuid": "37ba8b36-9595-46d6-b6a4-8d3bd9c15bc2",
+            "created_at": "2026-01-15T00:00:00Z",
+            "updated_at": "2026-01-15T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "policy": 4,
+            "description": "Sinistro referente à apólice POL-1004",
+            "status": "ANALYSIS",
+            "loss_amount": "28283.00",
+            "indemnity_amount": "7865.00"
+        }
+    },
+    {
+        "model": "seguradora.claim",
+        "pk": 5,
+        "fields": {
+            "uuid": "91992f41-6ea6-4370-80ae-3af0f23e857d",
+            "created_at": "2026-01-16T00:00:00Z",
+            "updated_at": "2026-01-16T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "policy": 5,
+            "description": "Sinistro referente à apólice POL-1005",
+            "status": "PAID",
+            "loss_amount": "7103.00",
+            "indemnity_amount": "3584.00"
+        }
+    },
+    {
+        "model": "seguradora.claim",
+        "pk": 6,
+        "fields": {
+            "uuid": "d630b257-5992-47b3-ac5e-12a1c7a37133",
+            "created_at": "2026-01-17T00:00:00Z",
+            "updated_at": "2026-01-17T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "policy": 6,
+            "description": "Sinistro referente à apólice POL-1006",
+            "status": "ANALYSIS",
+            "loss_amount": "43311.00",
+            "indemnity_amount": "29077.00"
+        }
+    },
+    {
+        "model": "seguradora.claim",
+        "pk": 7,
+        "fields": {
+            "uuid": "7e3e50a4-5d43-4637-8162-e53521cd5b91",
+            "created_at": "2026-01-18T00:00:00Z",
+            "updated_at": "2026-01-18T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "policy": 7,
+            "description": "Sinistro referente à apólice POL-1007",
+            "status": "ANALYSIS",
+            "loss_amount": "44052.00",
+            "indemnity_amount": "31674.00"
+        }
+    },
+    {
+        "model": "seguradora.claim",
+        "pk": 8,
+        "fields": {
+            "uuid": "e845354d-7682-4be2-a05e-685c0695faa3",
+            "created_at": "2026-01-19T00:00:00Z",
+            "updated_at": "2026-01-19T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "policy": 8,
+            "description": "Sinistro referente à apólice POL-1008",
+            "status": "OPEN",
+            "loss_amount": "22261.00",
+            "indemnity_amount": "17403.00"
+        }
+    },
+    {
+        "model": "seguradora.claim",
+        "pk": 9,
+        "fields": {
+            "uuid": "da946bcc-0ab5-43c9-8aad-5d728f2ff436",
+            "created_at": "2026-01-20T00:00:00Z",
+            "updated_at": "2026-01-20T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "policy": 9,
+            "description": "Sinistro referente à apólice POL-1009",
+            "status": "PAID",
+            "loss_amount": "12331.00",
+            "indemnity_amount": "6947.00"
+        }
+    },
+    {
+        "model": "seguradora.claim",
+        "pk": 10,
+        "fields": {
+            "uuid": "b44f069b-3225-4fcc-8d48-f866aff3c55f",
+            "created_at": "2026-01-21T00:00:00Z",
+            "updated_at": "2026-01-21T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "policy": 10,
+            "description": "Sinistro referente à apólice POL-1010",
+            "status": "ANALYSIS",
+            "loss_amount": "18880.00",
+            "indemnity_amount": "18671.00"
+        }
+    }
+]

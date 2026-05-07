@@ -1,0 +1,70 @@
+[
+    {
+        "model": "seguradora.policy",
+        "pk": 1,
+        "fields": {
+            "uuid": "22222222-2222-2222-2222-222222222222",
+            "created_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "customer": 1,
+            "code": "POL-0001",
+            "status": "ACTIVE",
+            "expire_date": "2027-01-01",
+            "deductible_type": "FIXED",
+            "fixed_deductible": "1000.00",
+            "percentage_deductible": null,
+            "coverage_amount": "50000.00",
+            "property": "Veiculo",
+            "property_value": "80000.00",
+            "premium_amount": "1500.00",
+            "periodicity": "MONTHLY"
+        }
+    },
+    {
+        "model": "seguradora.claim",
+        "pk": 1,
+        "fields": {
+            "uuid": "33333333-3333-3333-3333-333333333333",
+            "created_at": "2026-01-02T00:00:00Z",
+            "updated_at": "2026-01-02T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "policy": 1,
+            "description": "Colisao frontal",
+            "status": "OPEN",
+            "loss_amount": "12000.00",
+            "indemnity_amount": "8000.00"
+        }
+    },
+    {
+        "model": "seguradora.payment",
+        "pk": 1,
+        "fields": {
+            "uuid": "44444444-4444-4444-4444-444444444444",
+            "created_at": "2026-01-03T00:00:00Z",
+            "updated_at": "2026-01-03T00:00:00Z",
+            "created_by": 1,
+            "updated_by": 1,
+            "is_deleted": false,
+            "deleted_at": null,
+            "deleted_by": null,
+            "direction": "RECEIVABLE",
+            "origin": "PREMIUM",
+            "description": "Mensalidade da apolice",
+            "amount": "1500.00",
+            "paid_amount": "500.00",
+            "due_date": "2026-02-01",
+            "paid_date": null,
+            "status": "PENDING",
+            "creditor_name": ""
+        }
+    }
+]

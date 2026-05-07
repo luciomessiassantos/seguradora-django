@@ -1,49 +1,54 @@
 from typing import Any
-from django.http import HttpRequest
-from django.http.response import HttpResponse as HttpResponse
-from django.views.generic import TemplateView, ListView, UpdateView, DeleteView, DetailView, View, CreateView
-from django.contrib.auth.views import LoginView, LogoutView
-from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
-from django.db.models import Q, Sum
-from .models import *
-from .forms import *
-from .mixins import *
-# Create your views here.
 
-# Views base para a criação das views de soft delete, restore, hard_delete e a lixeira de cada 
-# Model
-#
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import LoginView, LogoutView
+from django.core.paginator import Paginator
+from django.db.models import Q, Sum
+from django.http import HttpRequest
+from django.http.response import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView, View
+
+from .forms import ClaimForm, CustomerForm, CustomAuthenticationForm, PaymentForm, PolicyForm
+from .mixins import AdminAccessMixin, CustomerAccessMixin, FinanceAccessMixin, ManagerAccessMixin
+from .models import BaseModel, Claim, Customer, Payment, Policy
+
 
 class BaseSoftDeleteView(LoginRequiredMixin, DeleteView):
-
     model = BaseModel
+    success_url = reverse_lazy('redirect')
+
+    def get_queryset(self):
+        return self.model.objects.actives()
 
     def post(self, request, *args, **kwargs):
-        obj = get_object_or_404(self.model, uuid=kwargs['uuid'])
-        obj.soft_delete(user=request.user) 
+        obj = get_object_or_404(self.get_queryset(), uuid=kwargs['uuid'])
+        self.perform_soft_delete(obj, request.user)
+        return redirect(self.get_success_url())
 
+    def perform_soft_delete(self, obj, user):
+        obj.soft_delete(user=user)
 
-        return redirect(self.success_url)
 
 class BaseRestoreView(LoginRequiredMixin, View):
-
     model = BaseModel
+    success_url = reverse_lazy('redirect')
 
     def post(self, request, *args, **kwargs):
-        obj = get_object_or_404(self.model, uuid=kwargs['uuid'])
+        obj = get_object_or_404(self.model.objects.deleted(), uuid=kwargs['uuid'])
         obj.restore()
-
         return redirect(self.success_url)
+
 
 class BaseHardDeleteView(LoginRequiredMixin, DeleteView):
     model = BaseModel
+    success_url = reverse_lazy('redirect')
 
     def post(self, request, *args, **kwargs):
-        obj = get_object_or_404(self.model, uuid=kwargs['uuid'])
-        obj.delete() 
-        return redirect(self.success_url)
+        obj = get_object_or_404(self.model.objects.all(), uuid=kwargs['uuid'])
+        obj.delete()
+        return redirect(self.get_success_url())
 
 
 class BaseTrashView(LoginRequiredMixin, ListView):
@@ -55,8 +60,6 @@ class BaseTrashView(LoginRequiredMixin, ListView):
         return self.model.objects.deleted()
 
 
-# Views de Login 
-
 class LoginViewPage(LoginView):
     template_name = 'account/login.html'
     authentication_form = CustomAuthenticationForm
@@ -64,79 +67,74 @@ class LoginViewPage(LoginView):
     success_url = reverse_lazy('redirect')
 
     def get_success_url(self):
-        
         return reverse_lazy('redirect')
 
+
 class Redirect(LoginRequiredMixin, View):
-
     login_url = 'login'
-
     admin_page = reverse_lazy('admin_dashboard')
     customer = reverse_lazy('customer_page')
     manager = reverse_lazy('manager_dashboard')
     finance = reverse_lazy('finance_dashboard')
 
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        user_group = request.user.groups
+        user = request.user
 
-        if request.user.is_staff:
+        if user.is_superuser:
             return redirect(self.admin_page)
-        
-        if user_group.filter(name='customer'):
-            return redirect(self.customer)
-        
-        if user_group.filter(name='manager'):
+        if user.groups.filter(name='manager').exists():
             return redirect(self.manager)
-        
-        if user_group.filter(name='finance'):
+        if user.groups.filter(name='finance').exists():
             return redirect(self.finance)
-
-
-        return super().dispatch(request, *args, **kwargs)
+        if user.groups.filter(name='customer').exists():
+            return redirect(self.customer)
+        if user.is_staff:
+            return redirect(self.admin_page)
+        return redirect(self.login_url)
 
 
 class LogOutViewPage(LogoutView):
     next_page = 'hero'
 
 
-# Views do cliente customer_group
-
 class HeroPage(TemplateView):
     template_name = 'customer/hero.html'
 
+
 class SearchPolicyAjaxView(ListView):
     model = Policy
-    template_name = 'customer/partials/search_results.html'  
+    template_name = 'customer/partials/search_results.html'
     context_object_name = 'results'
 
+    ORDERING_MAP = {
+        'mais_recente': '-created_at',
+        'menos_recente': 'created_at',
+        'codigo': 'code',
+        '-codigo': '-code',
+        'status': 'status',
+        '-status': '-status',
+    }
+
     def get_queryset(self):
-        qs = Policy.objects.select_related('customer').all()
+        qs = Policy.objects.actives().select_related('customer')
         termo = self.request.GET.get('q', '').strip()
-        
+
         if termo:
-            qs = qs.filter(
-                Q(customer__cpf_cnpj__icontains=termo) |
-                Q(code__icontains=termo)
-            )
-        
+            qs = qs.filter(Q(customer__cpf_cnpj__icontains=termo) | Q(code__icontains=termo))
+
         status = self.request.GET.get('status')
         if status == 'ativa':
             qs = qs.filter(status='ACTIVE')
         elif status == 'inativas':
             qs = qs.filter(status__in=['INACTIVE', 'EXPIRED'])
-        
-        ordenar = self.request.GET.get('ordenar', '-created_at')  
-        if ordenar == 'mais_recente':
-            qs = qs.order_by('-created_at')
-        elif ordenar == 'menos_recente':
-            qs = qs.order_by('created_at')
-        else:
-            qs = qs.order_by(ordenar)  
-        return qs
+
+        ordenar = self.request.GET.get('ordenar', 'mais_recente')
+        return qs.order_by(self.ORDERING_MAP.get(ordenar, '-created_at'))
 
     def render_to_response(self, context, **response_kwargs):
-        context['total_results'] = len(context['results'])
+        context['total_results'] = context['results'].count()
         return render(self.request, self.template_name, context)
+
 
 class CustomerPage(CustomerAccessMixin, TemplateView):
     template_name = 'customer/customer_dashboard.html'
@@ -145,97 +143,113 @@ class CustomerPage(CustomerAccessMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         user = self.request.user
         customer_data = None
-        
-        if user.groups.filter(name='customer').exists() and hasattr(user, 'customer_profile'):
-            cpf_cnpj = user.customer_profile.cpf_cnpj # type: ignore
-            print(f"CPF/CNPJ do perfil: '{cpf_cnpj}'")
-            if cpf_cnpj:
-                try:
-                    customer_data = Customer.objects.get(cpf_cnpj=cpf_cnpj)
-                except Customer.DoesNotExist:
-                    print("Not exist profile, for some reason")
-                    customer_data = None
+        context['customer_not_found'] = False
+
+        profile = getattr(user, 'customer_profile', None)
+        if profile and profile.cpf_cnpj:
+            customer_data = Customer.objects.actives().filter(cpf_cnpj=profile.cpf_cnpj).first()
 
         context['customer'] = customer_data
-        context['customer_policies'] = customer_data.policies.all() # type: ignore
-
+        context['customer_policies'] = customer_data.policies.filter(is_deleted=False) if customer_data else Policy.objects.none()
+        if not customer_data:
+            context['customer_not_found'] = True
         return context
 
-
-# Views admin
 
 class AdminDashboard(AdminAccessMixin, TemplateView):
     template_name = 'admin/admin_dashboard.html'
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs) 
-        context['total_customers'] = Customer.objects.count()
-        context['total_policies'] = Policy.objects.count()
-        context['cover_total'] = Policy.objects.filter(status='ACTIVE').aggregate(Sum('coverage_amount'))['coverage_amount__sum']
+        context = super().get_context_data(**kwargs)
+        active_customers = Customer.objects.actives()
+        active_policies = Policy.objects.actives().select_related('customer')
+        active_claims = Claim.objects.actives().select_related('policy', 'policy__customer')
+        active_payments = Payment.objects.actives()
 
+        context['total_customers'] = active_customers.count()
+        context['total_policies'] = active_policies.count()
+        context['total_claims'] = active_claims.count()
+        context['total_payments'] = active_payments.count()
+        context['cover_total'] = active_policies.filter(status='ACTIVE').aggregate(total=Sum('coverage_amount'))['total'] or 0
 
+        context['customers'] = Paginator(active_customers, 10).get_page(self.request.GET.get('page_customers', 1))
+        context['policies'] = Paginator(active_policies, 10).get_page(self.request.GET.get('page_policies', 1))
+        context['claims'] = Paginator(active_claims, 10).get_page(self.request.GET.get('page_claims', 1))
+        context['payments'] = Paginator(active_payments, 10).get_page(self.request.GET.get('page_payments', 1))
         return context
 
-# Views manager
-
-from django.core.paginator import Paginator
-from django.views.generic import ListView
-from .models import Customer, Policy, Claim
-from .mixins import ManagerAccessMixin
 
 class ManagerDashboard(ManagerAccessMixin, TemplateView):
     template_name = 'manager/manager_dashboard.html'
 
-    # Não defina paginate_by aqui – faremos manualmente
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        active_customers = Customer.objects.actives()
+        active_policies = Policy.objects.actives().select_related('customer')
+        active_claims = Claim.objects.actives().select_related('policy', 'policy__customer')
 
-
-        context['total_customers'] = Customer.objects.count()
-        context['total_policies'] = Policy.objects.count()
-        context['total_claims'] = Claim.objects.count()
-
-
-        customers_qs = Customer.objects.all()
-        customers_paginator = Paginator(customers_qs, 10)  
-        page_customers = self.request.GET.get('page_customers', 1)
-        context['customers'] = customers_paginator.get_page(page_customers)
-
-
-        policies_qs = Policy.objects.all()
-        policies_paginator = Paginator(policies_qs, 10)
-        page_policies = self.request.GET.get('page_policies', 1)
-        context['policies'] = policies_paginator.get_page(page_policies)
-
-
-        claims_qs = Claim.objects.all()
-        claims_paginator = Paginator(claims_qs, 10)
-        page_claims = self.request.GET.get('page_claims', 1)
-        context['claims'] = claims_paginator.get_page(page_claims)
-
+        context['total_customers'] = active_customers.count()
+        context['total_policies'] = active_policies.count()
+        context['total_claims'] = active_claims.count()
+        context['customers'] = Paginator(active_customers, 10).get_page(self.request.GET.get('page_customers', 1))
+        context['policies'] = Paginator(active_policies, 10).get_page(self.request.GET.get('page_policies', 1))
+        context['claims'] = Paginator(active_claims, 10).get_page(self.request.GET.get('page_claims', 1))
         return context
-    
-class PolicyCreateView(ManagerAccessMixin, CreateView):
+
+
+
+class RoleAwareSuccessUrlMixin:
+    admin_success_url = reverse_lazy('admin_dashboard')
+
+    def get_success_url(self):
+        user = self.request.user
+        if user.is_authenticated and (user.is_superuser or user.is_staff):
+            return self.admin_success_url
+        return super().get_success_url()
+
+
+class RoleAwareCancelUrlMixin(RoleAwareSuccessUrlMixin):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cancel_url'] = self.get_success_url()
+        return context
+
+class AuditCreateMixin:
+    def form_valid(self, form):
+        if hasattr(form.instance, 'created_by') and not form.instance.created_by:
+            form.instance.created_by = self.request.user
+        if hasattr(form.instance, 'updated_by'):
+            form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class AuditUpdateMixin:
+    def form_valid(self, form):
+        if hasattr(form.instance, 'updated_by'):
+            form.instance.updated_by = self.request.user
+        return super().form_valid(form)
+
+
+class PolicyCreateView(RoleAwareCancelUrlMixin, AuditCreateMixin, ManagerAccessMixin, CreateView):
     model = Policy
     form_class = PolicyForm
     template_name = 'manager/create_policy.html'
     success_url = reverse_lazy('manager_dashboard')
 
-class CustomerCreateView(ManagerAccessMixin, CreateView):
+
+class CustomerCreateView(RoleAwareCancelUrlMixin, AuditCreateMixin, ManagerAccessMixin, CreateView):
     model = Customer
     form_class = CustomerForm
     template_name = 'manager/register_customer.html'
     success_url = reverse_lazy('manager_dashboard')
 
-class ClaimCreateView(ManagerAccessMixin, CreateView):
+
+class ClaimCreateView(RoleAwareCancelUrlMixin, AuditCreateMixin, ManagerAccessMixin, CreateView):
     model = Claim
     form_class = ClaimForm
     template_name = 'manager/create_claim.html'
     success_url = reverse_lazy('manager_dashboard')
 
-
-# Views finance
 
 class FinanceDashboard(FinanceAccessMixin, ListView):
     template_name = 'finance/finance_dashboard.html'
@@ -243,36 +257,119 @@ class FinanceDashboard(FinanceAccessMixin, ListView):
     context_object_name = 'payments'
     paginate_by = 5
 
+    def get_queryset(self):
+        return Payment.objects.actives()
+
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-
-        context['total_income'] = Payment.objects.filter(direction='RECEIVABLE').filter(status='PAID').aggregate(Sum('paid_amount'))['paid_amount__sum']
-        context['total_cover'] = Payment.objects.filter(direction='PAYABLE').filter(status='PAID').aggregate(Sum('paid_amount'))['paid_amount__sum']
-        context['total_barred'] = Payment.objects.filter(status__in=['PENDING', 'OVERDUE']).aggregate(Sum('paid_amount'))['paid_amount__sum']
-
-        
+        active_payments = Payment.objects.actives()
+        context['total_income'] = active_payments.filter(direction='RECEIVABLE', status='PAID').aggregate(total=Sum('paid_amount'))['total'] or 0
+        context['total_cover'] = active_payments.filter(direction='PAYABLE', status='PAID').aggregate(total=Sum('paid_amount'))['total'] or 0
+        context['total_barred'] = active_payments.filter(status__in=['PENDING', 'OVERDUE']).aggregate(total=Sum('amount'))['total'] or 0
         return context
 
-class PaymentCreateView(FinanceAccessMixin, CreateView):
+
+class PaymentCreateView(RoleAwareCancelUrlMixin, AuditCreateMixin, FinanceAccessMixin, CreateView):
     model = Payment
     form_class = PaymentForm
     template_name = 'finance/register_payment.html'
     success_url = reverse_lazy('finance_dashboard')
 
 
-# Details Views
-
 class PolicyDetails(DetailView):
     template_name = 'details/policy_details.html'
     model = Policy
-    slug_field = 'uuid'         
+    slug_field = 'uuid'
     slug_url_kwarg = 'uuid'
     context_object_name = 'policy'
+
+    def get_queryset(self):
+        return Policy.objects.actives().select_related('customer')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        
-        is_manager_or_staff = user.is_staff or user.groups.filter(name='manager').exists()
-        context['is_manager_or_staff'] = is_manager_or_staff
+        context['is_manager_or_staff'] = user.is_authenticated and (
+            user.is_staff or user.is_superuser or user.groups.filter(name='manager').exists()
+        )
         return context
+
+
+class CustomerUpdateView(RoleAwareCancelUrlMixin, AuditUpdateMixin, ManagerAccessMixin, UpdateView):
+    model = Customer
+    form_class = CustomerForm
+    template_name = 'manager/register_customer.html'
+    slug_field = 'uuid'
+    slug_url_kwarg = 'uuid'
+    success_url = reverse_lazy('manager_dashboard')
+
+    def get_queryset(self):
+        return Customer.objects.actives()
+
+
+class PolicyUpdateView(RoleAwareCancelUrlMixin, AuditUpdateMixin, ManagerAccessMixin, UpdateView):
+    model = Policy
+    form_class = PolicyForm
+    template_name = 'manager/create_policy.html'
+    slug_field = 'uuid'
+    slug_url_kwarg = 'uuid'
+    success_url = reverse_lazy('manager_dashboard')
+
+    def get_queryset(self):
+        return Policy.objects.actives()
+
+
+class ClaimUpdateView(RoleAwareCancelUrlMixin, AuditUpdateMixin, ManagerAccessMixin, UpdateView):
+    model = Claim
+    form_class = ClaimForm
+    template_name = 'manager/create_claim.html'
+    slug_field = 'uuid'
+    slug_url_kwarg = 'uuid'
+    success_url = reverse_lazy('manager_dashboard')
+
+    def get_queryset(self):
+        return Claim.objects.actives()
+
+
+class PaymentUpdateView(RoleAwareCancelUrlMixin, AuditUpdateMixin, FinanceAccessMixin, UpdateView):
+    model = Payment
+    form_class = PaymentForm
+    template_name = 'finance/register_payment.html'
+    slug_field = 'uuid'
+    slug_url_kwarg = 'uuid'
+    success_url = reverse_lazy('finance_dashboard')
+
+    def get_queryset(self):
+        return Payment.objects.actives()
+
+
+class CustomerSoftDeleteView(RoleAwareSuccessUrlMixin, ManagerAccessMixin, BaseSoftDeleteView):
+    model = Customer
+    success_url = reverse_lazy('manager_dashboard')
+
+    def perform_soft_delete(self, obj, user):
+        for policy in obj.policies.filter(is_deleted=False):
+            for claim in policy.claims.filter(is_deleted=False):
+                claim.soft_delete(user=user)
+            policy.soft_delete(user=user)
+        obj.soft_delete(user=user)
+
+
+class PolicySoftDeleteView(RoleAwareSuccessUrlMixin, ManagerAccessMixin, BaseSoftDeleteView):
+    model = Policy
+    success_url = reverse_lazy('manager_dashboard')
+
+    def perform_soft_delete(self, obj, user):
+        for claim in obj.claims.filter(is_deleted=False):
+            claim.soft_delete(user=user)
+        obj.soft_delete(user=user)
+
+
+class ClaimSoftDeleteView(RoleAwareSuccessUrlMixin, ManagerAccessMixin, BaseSoftDeleteView):
+    model = Claim
+    success_url = reverse_lazy('manager_dashboard')
+
+
+class PaymentSoftDeleteView(RoleAwareSuccessUrlMixin, FinanceAccessMixin, BaseSoftDeleteView):
+    model = Payment
+    success_url = reverse_lazy('finance_dashboard')

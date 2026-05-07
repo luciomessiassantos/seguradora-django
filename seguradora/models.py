@@ -1,4 +1,5 @@
 from decimal import Decimal
+import sys
 import uuid
 from django.db import models
 from django.utils import timezone
@@ -19,9 +20,14 @@ class CustomerProfile(models.Model):
     )
 
     def clean(self):
-        
-        if self.cpf_cnpj and not self.user.groups.filter(name='customer').exists():
-            raise ValidationError({'cpf_cnpj': 'Apenas usuários do grupo "customer" podem ter CPF/CNPJ.'})
+
+        if 'loaddata' in sys.argv:
+            return
+
+        if not self.user.groups.filter(name='customer').exists():
+            raise ValidationError({
+                'cpf_cnpj': 'Apenas usuários do grupo "customer" podem ter CPF/CNPJ.'
+            })
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -92,17 +98,41 @@ class BaseModel(models.Model):
         ]
 
     def soft_delete(self, user=None):
-        self.is_deleted = True
-        self.deleted_at = timezone.now()
-        if user:
-            self.deleted_by = user
-        self.save()
+        if self.is_deleted and self.deleted_at and self.deleted_by:
+            return
 
-    def restore(self):
+        self.is_deleted = True
+
+        if not self.deleted_at:
+            self.deleted_at = timezone.now()
+
+        if user and getattr(user, 'is_authenticated', False):
+            self.deleted_by = user
+            self.updated_by = user
+
+        self.save(update_fields=[
+            'is_deleted',
+            'deleted_at',
+            'deleted_by',
+            'updated_by',
+            'updated_at',
+        ])
+
+    def restore(self, user=None):
+        if not self.is_deleted and not self.deleted_at and not self.deleted_by:
+            return
+
         self.is_deleted = False
         self.deleted_at = None
         self.deleted_by = None
-        self.save()
+
+        update_fields = ['is_deleted', 'deleted_at', 'deleted_by', 'updated_at']
+
+        if user and getattr(user, 'is_authenticated', False):
+            self.updated_by = user
+            update_fields.append('updated_by')
+
+        self.save(update_fields=update_fields)
 
 
 
